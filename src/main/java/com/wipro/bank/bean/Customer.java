@@ -18,6 +18,6 @@ public class Customer {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "customer_profile")
+    @OneToMany(mappedBy = "customer")
     private Set<Account> accounts;
 }
