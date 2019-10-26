@@ -87,6 +87,15 @@ public class CustomerDAOImplTest {
     }
 
     @Test
+    public void doesExistsById() {
+        List<Integer> ids = template.query("select id from customer_profile", idMapper);
+        ids.stream().forEach(id -> {
+            assertTrue(ids.contains(id));
+            assertTrue(dao.existsById(id));
+        });
+    }
+
+    @Test
     public void doesNotExistsById() {
         List<Integer> ids = template.query("select id from customer_profile", idMapper);
         assertThat(ids, not(contains(999)));

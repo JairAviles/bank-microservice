@@ -44,7 +44,6 @@ public class AccountDAOImplTest {
         accounts.stream().forEach(account -> dao.saveAccount(account));
     }
 
-
     private RowMapper<Integer> idMapper = (rs, num) -> rs.getInt("id");
 
     @Test
@@ -92,6 +91,22 @@ public class AccountDAOImplTest {
                     dao.delete(account.get());
                 });
         assertEquals(0, dao.count());
+    }
+
+    @Test
+    public void doesExistsById() {
+        List<Integer> ids = template.query("select id from account", idMapper);
+        ids.stream().forEach(id -> {
+            assertTrue(ids.contains(id));
+            assertTrue(dao.existsById(id));
+        });
+    }
+
+    @Test
+    public void doesNotExistsById() {
+        List<Integer> ids = template.query("select id from account", idMapper);
+        assertThat(ids, not(contains(999)));
+        assertFalse(dao.existsById(999));
     }
 
 }
