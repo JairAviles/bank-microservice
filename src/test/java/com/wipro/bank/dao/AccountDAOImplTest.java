@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve"})
@@ -35,9 +37,9 @@ public class AccountDAOImplTest {
     @BeforeEach
     public void setUp() {
         accounts = Arrays.asList(
-                new AccountDTO(new CustomerDTO("Jair Aviles"), 1234.79),
-                new AccountDTO(new CustomerDTO("Jair Aviles"), 5000.0),
-                new AccountDTO(new CustomerDTO("Avinash Patel"), 10542.84)
+                AccountDTO.builder().customer(CustomerDTO.builder().customerId(1).name("Jair Aviles").build()).balance(1234.79).build(),
+                AccountDTO.builder().customer(CustomerDTO.builder().customerId(1).name("Jair Aviles").build()).balance(5000.0).build(),
+                AccountDTO.builder().customer(CustomerDTO.builder().customerId(3).name("Avinash Patel").build()).balance(10542.84).build()
         );
         accounts.stream().forEach(account -> dao.saveAccount(account));
     }
@@ -47,7 +49,7 @@ public class AccountDAOImplTest {
 
     @Test
     public void saveAccount_successfully() {
-        AccountDTO account = new AccountDTO(new CustomerDTO("Jagraj Singh"), 2000.43);
+        AccountDTO account = AccountDTO.builder().customer(CustomerDTO.builder().customerId(4).name("Jagraj Singh'").build()).balance(2000.43).build();
         account = dao.saveAccount(account);
         assertNotNull(account.getAccountId());
     }
@@ -73,13 +75,7 @@ public class AccountDAOImplTest {
         List<Integer> dbAccounts = dao.findAll().stream()
                 .map(AccountDTO::getAccountId)
                 .collect(Collectors.toList());
-        assertTrue(dbAccounts.size() > 0);
-    }
-
-    @Test
-    public void findByCustomerId_thatDoesNotExist() {
-        List<AccountDTO> accounts = dao.findByCustomerId(999);
-        assertTrue(accounts.size() == 0);
+        assertThat(dbAccounts, not(emptyIterable()));
     }
 
     @Test

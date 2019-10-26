@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +33,7 @@ public class CustomerDAOImplTest {
 
     @Test
     public void saveCustomer_successfully() {
-        CustomerDTO customer = new CustomerDTO("Peter Lee");
+        CustomerDTO customer = CustomerDTO.builder().name("Peter Lee").build();
         customer = dao.saveCustomer(customer);
         assertNotNull(customer.getCustomerId());
     }
@@ -59,6 +59,7 @@ public class CustomerDAOImplTest {
         List<String> dbNames = dao.findAll().stream()
                                 .map(CustomerDTO::getName)
                                 .collect(Collectors.toList());
+        assertThat(dbNames, not(emptyIterable()));
         assertThat(dbNames,
                 containsInAnyOrder("Avinash Patel", "Jair Aviles", "Jagraj Singh", "Israel Eusebio"));
     }

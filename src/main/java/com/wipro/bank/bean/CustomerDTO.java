@@ -5,24 +5,23 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Set;
 
-@Entity
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@Entity
 @Table(name = "customer_profile")
 public class CustomerDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int customerId;
-    @Column(name = "name")
     @NonNull
+    private int customerId;
+    @NonNull
+    @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(cascade=CascadeType.ALL, mappedBy = "customer")
     private Set<AccountDTO> accounts;
-
-    public CustomerDTO(@NonNull String name) {
-        this.name = name;
-    }
 
 }

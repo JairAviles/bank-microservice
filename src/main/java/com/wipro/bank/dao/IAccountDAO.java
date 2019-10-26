@@ -9,7 +9,6 @@ public interface IAccountDAO {
     AccountDTO saveAccount(AccountDTO accountDTO);
     Optional<AccountDTO> findById(Integer id);
     List<AccountDTO> findAll();
-    List<AccountDTO> findByCustomerId(Integer customerId);
     long count();
     void delete(AccountDTO accountDTO);
 }

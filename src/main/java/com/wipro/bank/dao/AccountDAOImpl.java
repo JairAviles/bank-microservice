@@ -32,13 +32,6 @@ public class AccountDAOImpl implements IAccountDAO {
     }
 
     @Override
-    public List<AccountDTO> findByCustomerId(Integer customerId) {
-        return entityManager.createQuery("select a from AccountDTO a where a.id =: id", AccountDTO.class)
-                .setParameter("id", customerId)
-                .getResultList();
-    }
-
-    @Override
     public long count() {
         return entityManager.createQuery("select count(a) from AccountDTO a", Long.class)
                 .getSingleResult();

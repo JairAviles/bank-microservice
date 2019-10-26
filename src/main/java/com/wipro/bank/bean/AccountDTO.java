@@ -6,6 +6,8 @@ import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "account")
 public class AccountDTO {
@@ -13,15 +15,10 @@ public class AccountDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int accountId;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "customerId")
     @NonNull
     private CustomerDTO customer;
     @NonNull
     private Double balance;
-
-    public AccountDTO(@NonNull CustomerDTO customer, @NonNull Double balance) {
-        this.customer = customer;
-        this.balance = balance;
-    }
 }
