@@ -11,4 +11,5 @@ public interface IAccountDAO {
     List<AccountDTO> findAll();
     long count();
     void delete(AccountDTO accountDTO);
+    boolean existsById(Integer id);
 }
