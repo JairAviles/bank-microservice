@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>b8.ja40013952.foundation.bank</groupId>
 	<artifactId>JA40013952_bank</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Customer Account Tracker V3</name>
 	<description>Microservices Foundation Certification - Case Study</description>
 

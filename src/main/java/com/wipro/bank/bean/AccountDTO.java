@@ -1,7 +1,6 @@
 package com.wipro.bank.bean;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -9,13 +8,20 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "account")
-public class Account {
+public class AccountDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int accountId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customerId")
-    private Customer customer;
+    @NonNull
+    private CustomerDTO customer;
+    @NonNull
     private Double balance;
+
+    public AccountDTO(@NonNull CustomerDTO customer, @NonNull Double balance) {
+        this.customer = customer;
+        this.balance = balance;
+    }
 }

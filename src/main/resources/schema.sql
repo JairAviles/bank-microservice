@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS customer_profile;
-DROP TABLE IF EXISTS account;
+DROP TABLE IF EXISTS accountDTO;
 
 CREATE TABLE customer_profile (
   id         INT         NOT NULL AUTO_INCREMENT,
@@ -7,7 +7,7 @@ CREATE TABLE customer_profile (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE account (
+CREATE TABLE accountDTO (
   id            INT   NOT NULL AUTO_INCREMENT,
   balance       FLOAT NOT NULL,
   customer_id   INT NOT NULL,
