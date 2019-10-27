@@ -1,8 +1,10 @@
 package com.wipro.bank.bean;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Data
@@ -11,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "customer_profile")
-public class CustomerDTO {
+public class CustomerDTO implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -21,7 +23,8 @@ public class CustomerDTO {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade=CascadeType.ALL, mappedBy = "customer")
+    @OneToMany(cascade=CascadeType.ALL, mappedBy = "customer", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<AccountDTO> accounts;
 
 }

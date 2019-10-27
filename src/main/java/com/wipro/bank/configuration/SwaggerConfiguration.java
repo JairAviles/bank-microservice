@@ -21,11 +21,11 @@ public class SwaggerConfiguration {
 
     public Docket documentation() {
         return new Docket(DocumentationType.SWAGGER_2)
+                    .apiInfo(apiInfo())
                     .select()
                     .apis(RequestHandlerSelectors.basePackage("com.wipro.bank.controller"))
                     .paths(paths())
-                    .build()
-                    .apiInfo(apiInfo());
+                    .build();
     }
 
     private Predicate<String> paths() {
