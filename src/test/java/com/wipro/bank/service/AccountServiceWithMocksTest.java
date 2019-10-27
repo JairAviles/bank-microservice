@@ -3,7 +3,6 @@ package com.wipro.bank.service;
 import com.wipro.bank.bean.AccountDTO;
 import com.wipro.bank.bean.CustomerDTO;
 import com.wipro.bank.dao.IAccountDAO;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 public class AccountServiceWithMocksTest {
