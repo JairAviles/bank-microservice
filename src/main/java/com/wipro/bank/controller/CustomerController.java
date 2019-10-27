@@ -2,6 +2,7 @@ package com.wipro.bank.controller;
 
 import com.wipro.bank.bean.CustomerDTO;
 import com.wipro.bank.bean.CustomerRequest;
+import com.wipro.bank.exception.CustomerNotFoundException;
 import com.wipro.bank.service.CustomerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,14 +30,14 @@ public class CustomerController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @GetMapping
+    @GetMapping(produces = "application/json")
     @ApiOperation(value = "List Customers", notes = "Service for finding all existing customers")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Customers found")})
     public ResponseEntity<List<CustomerDTO>> findAll() {
         return ResponseEntity.ok(this.service.getAllCustomers());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}", produces = "application/json")
     @ApiOperation(value = "Find Customer by Id", notes = "Service for finding an existing customer by id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Customer found"),
@@ -48,11 +49,13 @@ public class CustomerController {
         if (customer.isPresent()) {
             return new ResponseEntity<>(customer.get(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            String errorMessage = String.format("Customer with id: %d not found", customerId);
+            log.severe(errorMessage);
+            throw new CustomerNotFoundException(errorMessage);
         }
     }
 
-    @PostMapping
+    @PostMapping(produces = "application/json")
     @ApiOperation(value = "Create Customer", notes = "Service for creating a new customer")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Customer created successfully"),
@@ -60,25 +63,46 @@ public class CustomerController {
     })
     public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerRequest customer) {
         CustomerDTO customerDto = convertToDto(customer);
-        customerDto = this.service.addCustomer(customerDto);
-        return new ResponseEntity<>(customerDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(this.service.addCustomer(customerDto), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping(path = "/{id}", produces = "application/json")
+    @ApiOperation(value = "Create Customer", notes = "Service for creating a new customer")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Customer updated successfully"),
+            @ApiResponse(code = 400, message = "Invalid request")
+    })
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable("id") Integer customerId, @RequestBody CustomerRequest customer) {
+        Optional<CustomerDTO> customerDto = this.service.getCustomer(customerId);
+        if (!customerDto.isPresent()) {
+            String errorMessage = String.format("Customer with id: %d not found", customerId);
+            log.severe(errorMessage);
+            throw new CustomerNotFoundException(errorMessage);
+        } else {
+            customer.setCustomerId(customerId);
+            CustomerDTO newCustomerDto = convertToDto(customer);
+            return new ResponseEntity<>(this.service.updateCustomer(newCustomerDto), HttpStatus.OK);
+        }
+
+    }
+
+    @DeleteMapping(path = "/{id}", produces = "application/json")
     @ApiOperation(value = "Customer by Id", notes = "Service for finding an existing customer by id")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Customer deleted successfully"),
+            @ApiResponse(code = 204, message = "Customer deleted successfully"),
             @ApiResponse(code = 400, message = "Invalid request"),
             @ApiResponse(code = 404, message = "Customer not found")
     })
-    public ResponseEntity<CustomerDTO> removeCustomer(@PathVariable("id") Integer customerId) {
+    public ResponseEntity<String> removeCustomer(@PathVariable("id") Integer customerId) {
         Optional<CustomerDTO> customer = this.service.getCustomer(customerId);
 
         if (!customer.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            String errorMessage = String.format("Customer with id: %d not found", customerId);
+            log.severe(errorMessage);
+            throw new CustomerNotFoundException(errorMessage);
         } else {
             this.service.removeCustomer(customer.get());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 

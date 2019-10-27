@@ -60,7 +60,7 @@ public class CustomerControllerIntegrationTest {
     }
 
     @Test
-    public void givenCustomers_whenCreateCustomer_thenReturnJsonArray() throws Exception {
+    public void givenCustomers_whenCreateCustomer_thenReturnJsonObject() throws Exception {
         CustomerDTO newCustomer = CustomerDTO.builder().customerId(5).name("Marty McCustomer").build();
         CustomerRequest customerRequest = CustomerRequest.builder().name("Marty McCustomer").build();
         String json = objectMapper.writeValueAsString(customerRequest);
@@ -70,7 +70,37 @@ public class CustomerControllerIntegrationTest {
                 .content(json)
                 .characterEncoding("utf-8"))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Marty McCustomer"))
                 .andReturn();
+    }
+
+    @Test
+    public void givenCustomers_whenUpdateCustomer_thenReturnJsonObject() throws Exception {
+        CustomerDTO updatedCustomer = CustomerDTO.builder().customerId(1).name("Marty McCustomer").build();
+        CustomerRequest customerRequest = CustomerRequest.builder().name("Marty McCustomer").build();
+        String json = objectMapper.writeValueAsString(customerRequest);
+        given(service.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
+        given(service.updateCustomer(any())).willReturn(updatedCustomer);
+        mockMvc.perform(put("/api/customers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.customerId").value(1))
+                .andExpect(jsonPath("$.name").value("Marty McCustomer"))
+                .andReturn();
+    }
+
+    @Test
+    public void givenCustomers_whenUpdateCustomer_thenReturnNotFoundStatus() throws Exception {
+        CustomerRequest customerRequest = CustomerRequest.builder().name("Marty McCustomer").build();
+        String json = objectMapper.writeValueAsString(customerRequest);
+        given(service.getCustomer(anyInt())).willReturn(Optional.empty());
+        mockMvc.perform(put("/api/customers/999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -104,12 +134,12 @@ public class CustomerControllerIntegrationTest {
     }
 
     @Test
-    public void givenCustomer_whenRemoveCustomer_thenReturnOkStatus() throws Exception {
+    public void givenCustomer_whenRemoveCustomer_thenReturnNoContentStatus() throws Exception {
         given(service.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
 
         mockMvc.perform(delete("/api/customers/1")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

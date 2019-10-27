@@ -8,15 +8,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class CustomerNotFoundException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public CustomerNotFoundException() {
-        super();
-    }
-
     public CustomerNotFoundException(@Nullable String message) {
         super(message);
     }
 
-    public CustomerNotFoundException(@Nullable String message, @Nullable  Throwable cause) {
-        super(message, cause);
-    }
 }
