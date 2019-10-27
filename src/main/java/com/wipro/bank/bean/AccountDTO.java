@@ -1,5 +1,6 @@
 package com.wipro.bank.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "account")
+@JsonIgnoreProperties(value = { "customer" })
 public class AccountDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

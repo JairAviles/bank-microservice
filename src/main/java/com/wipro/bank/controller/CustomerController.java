@@ -3,6 +3,7 @@ package com.wipro.bank.controller;
 import com.wipro.bank.bean.CustomerDTO;
 import com.wipro.bank.bean.CustomerRequest;
 import com.wipro.bank.exception.CustomerNotFoundException;
+import com.wipro.bank.exception.BadRequestException;
 import com.wipro.bank.service.CustomerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -59,7 +60,7 @@ public class CustomerController {
     @ApiOperation(value = "Create Customer", notes = "Service for creating a new customer")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Customer created successfully"),
-            @ApiResponse(code = 400, message = "Invalid request")
+            @ApiResponse(code = 400, message = "Bad request")
     })
     public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerRequest customer) {
         CustomerDTO customerDto = convertToDto(customer);
@@ -67,10 +68,10 @@ public class CustomerController {
     }
 
     @PutMapping(path = "/{id}", produces = "application/json")
-    @ApiOperation(value = "Create Customer", notes = "Service for creating a new customer")
+    @ApiOperation(value = "Update Customer", notes = "Service for updating an existing customer")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Customer updated successfully"),
-            @ApiResponse(code = 400, message = "Invalid request")
+            @ApiResponse(code = 400, message = "Bad request")
     })
     public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable("id") Integer customerId, @RequestBody CustomerRequest customer) {
         Optional<CustomerDTO> customerDto = this.service.getCustomer(customerId);
@@ -80,8 +81,8 @@ public class CustomerController {
             throw new CustomerNotFoundException(errorMessage);
         } else {
             customer.setCustomerId(customerId);
-            CustomerDTO newCustomerDto = convertToDto(customer);
-            return new ResponseEntity<>(this.service.updateCustomer(newCustomerDto), HttpStatus.OK);
+            CustomerDTO updatedCustomerDto = convertToDto(customer);
+            return new ResponseEntity<>(this.service.updateCustomer(updatedCustomerDto), HttpStatus.OK);
         }
 
     }
@@ -90,7 +91,7 @@ public class CustomerController {
     @ApiOperation(value = "Customer by Id", notes = "Service for finding an existing customer by id")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Customer deleted successfully"),
-            @ApiResponse(code = 400, message = "Invalid request"),
+            @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 404, message = "Customer not found")
     })
     public ResponseEntity<String> removeCustomer(@PathVariable("id") Integer customerId) {
@@ -107,6 +108,11 @@ public class CustomerController {
     }
 
     private CustomerDTO convertToDto(CustomerRequest customer) {
+        if (customer.getName() == null || customer.getName().isEmpty()) {
+            String errorMessage = String.format("Customer name is required for this operation");
+            log.severe(errorMessage);
+            throw new BadRequestException(errorMessage);
+        }
         CustomerDTO customerDto = modelMapper.map(customer, CustomerDTO.class);
         return customerDto;
     }

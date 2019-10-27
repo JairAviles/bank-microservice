@@ -35,13 +35,12 @@ public class CustomerControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CustomerService service;
+    private CustomerService customerService;
 
     @MockBean
     private ModelMapper modelMapper;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-
     private List<CustomerDTO> customers;
 
     @BeforeEach
@@ -64,7 +63,8 @@ public class CustomerControllerIntegrationTest {
         CustomerDTO newCustomer = CustomerDTO.builder().customerId(5).name("Marty McCustomer").build();
         CustomerRequest customerRequest = CustomerRequest.builder().name("Marty McCustomer").build();
         String json = objectMapper.writeValueAsString(customerRequest);
-        given(service.addCustomer(any())).willReturn(newCustomer);
+        given(modelMapper.map(any(), any())).willReturn(newCustomer);
+        given(customerService.addCustomer(any())).willReturn(newCustomer);
         mockMvc.perform(post("/api/customers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -75,12 +75,25 @@ public class CustomerControllerIntegrationTest {
     }
 
     @Test
+    public void givenCustomers_whenCreateCustomer_thenBadRequestStatus() throws Exception {
+        CustomerRequest customerRequest = CustomerRequest.builder().build();
+        String json = objectMapper.writeValueAsString(customerRequest);
+        mockMvc.perform(post("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
     public void givenCustomers_whenUpdateCustomer_thenReturnJsonObject() throws Exception {
         CustomerDTO updatedCustomer = CustomerDTO.builder().customerId(1).name("Marty McCustomer").build();
         CustomerRequest customerRequest = CustomerRequest.builder().name("Marty McCustomer").build();
         String json = objectMapper.writeValueAsString(customerRequest);
-        given(service.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
-        given(service.updateCustomer(any())).willReturn(updatedCustomer);
+        given(customerService.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
+        given(modelMapper.map(any(), any())).willReturn(updatedCustomer);
+        given(customerService.updateCustomer(any())).willReturn(updatedCustomer);
         mockMvc.perform(put("/api/customers/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -95,7 +108,7 @@ public class CustomerControllerIntegrationTest {
     public void givenCustomers_whenUpdateCustomer_thenReturnNotFoundStatus() throws Exception {
         CustomerRequest customerRequest = CustomerRequest.builder().name("Marty McCustomer").build();
         String json = objectMapper.writeValueAsString(customerRequest);
-        given(service.getCustomer(anyInt())).willReturn(Optional.empty());
+        given(customerService.getCustomer(anyInt())).willReturn(Optional.empty());
         mockMvc.perform(put("/api/customers/999")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -105,7 +118,7 @@ public class CustomerControllerIntegrationTest {
 
     @Test
     public void givenCustomers_whenFindAll__thenReturnJsonObject() throws Exception {
-        given(service.getAllCustomers()).willReturn(customers);
+        given(customerService.getAllCustomers()).willReturn(customers);
 
         mockMvc.perform(get("/api/customers")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -115,7 +128,7 @@ public class CustomerControllerIntegrationTest {
 
     @Test
     public void givenCustomer_whenFindById_thenReturnJsonObject() throws Exception {
-        given(service.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
+        given(customerService.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
 
         mockMvc.perform(get("/api/customers/1")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -126,7 +139,7 @@ public class CustomerControllerIntegrationTest {
 
     @Test
     public void givenCustomer_whenNotFindById_thenReturnNotFoundStatus() throws Exception {
-        given(service.getCustomer(anyInt())).willReturn(Optional.empty());
+        given(customerService.getCustomer(anyInt())).willReturn(Optional.empty());
 
         mockMvc.perform(get("/api/customers/999")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -135,7 +148,7 @@ public class CustomerControllerIntegrationTest {
 
     @Test
     public void givenCustomer_whenRemoveCustomer_thenReturnNoContentStatus() throws Exception {
-        given(service.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
+        given(customerService.getCustomer(anyInt())).willReturn(Optional.of(customers.get(0)));
 
         mockMvc.perform(delete("/api/customers/1")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -144,7 +157,7 @@ public class CustomerControllerIntegrationTest {
 
     @Test
     public void givenCustomer_whenRemoveCustomerNotFound_thenReturnNotFoundStatus() throws Exception {
-        given(service.getCustomer(anyInt())).willReturn(Optional.empty());
+        given(customerService.getCustomer(anyInt())).willReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/customers/999")
                 .contentType(MediaType.APPLICATION_JSON))

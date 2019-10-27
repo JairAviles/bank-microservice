@@ -138,6 +138,7 @@
 						<configuration>
 							<excludes>
 								<exclude>com/wipro/bank/bean/**/*.class</exclude>
+								<exclude>com/wipro/bank/configuration/**/*.class</exclude>
 							</excludes>
 						</configuration>
 					</execution>
