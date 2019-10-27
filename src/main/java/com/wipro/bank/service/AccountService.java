@@ -29,6 +29,17 @@ public class AccountService {
     }
 
     /**
+     * Method that calls the save method from persistence layer
+     * to update an existing account
+     * @param account
+     * @return AccountDTO
+     */
+    @Transactional
+    public AccountDTO updateAccount(AccountDTO account) {
+        return this.dao.saveAccount(account);
+    }
+
+    /**
      * Method that calls the delete method from persistence layer
      * to remove an existing account
      * @param account
@@ -55,8 +66,42 @@ public class AccountService {
         return this.dao.findAll();
     }
 
-    public String transferFunds(int from, int to, double amount) {
+    /**
+     * Method that validates if customer id
+     * exists in DB
+     * @param id
+     * @return boolean
+     */
+    public boolean exists(Integer id) {
+        return this.dao.existsById(id);
+    }
 
-        return "";
+    /**
+     * Do a transfer of funds or return an invalid status
+     * @param from
+     * @param to
+     * @param amount
+     * @return TransferStatus
+     */
+
+    public String transferFunds(int from, int to, double amount) {
+        if (!exists(from) || !exists(to)) {
+            return TransferStatus.ID_MISMATCH.toString();
+        } else {
+            AccountDTO fromAccount = getBalanceOf(from).get();
+            AccountDTO toAccount = getBalanceOf(to).get();
+
+            if (amount > fromAccount.getBalance()) {
+                return TransferStatus.INSUFFICIENT_FUNDS.toString();
+            } else {
+                toAccount.setBalance(toAccount.getBalance() + amount);
+                updateAccount(toAccount);
+                fromAccount.setBalance(fromAccount.getBalance() - amount);
+                updateAccount(fromAccount);
+
+                return TransferStatus.SUCCESS.toString();
+            }
+
+        }
     }
 }

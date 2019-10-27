@@ -30,6 +30,17 @@ public class CustomerService {
     }
 
     /**
+     * Method that calls the save method from persistence layer
+     * to update an existing customer
+     * @param customer
+     * @return CustomerDTO
+     */
+    @Transactional
+    public CustomerDTO updateCustomer(CustomerDTO customer) {
+        return this.dao.saveCustomer(customer);
+    }
+
+    /**
      * Method that calls the delete method from persistence layer
      * to remove an existing customer
      * @param customer
