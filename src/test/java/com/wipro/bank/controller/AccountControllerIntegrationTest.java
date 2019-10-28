@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wipro.bank.bean.AccountDTO;
 import com.wipro.bank.bean.AccountRequest;
 import com.wipro.bank.bean.CustomerDTO;
+import com.wipro.bank.bean.TransferRequest;
 import com.wipro.bank.service.AccountService;
 import com.wipro.bank.service.CustomerService;
+import lombok.extern.java.Log;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,21 +19,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static com.wipro.bank.service.TransferStatus.*;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Log
 @WebMvcTest(AccountController.class)
 @ExtendWith(SpringExtension.class)
 class AccountControllerIntegrationTest {
@@ -165,6 +168,69 @@ class AccountControllerIntegrationTest {
                 .characterEncoding("utf-8"))
                 .andExpect(status().isNotFound())
                 .andReturn();
+    }
+
+    @Test
+    public void givenAccounts_whenTransferFounds_thenIdMismatch() throws Exception {
+        TransferRequest transfer = TransferRequest.builder().from(1).to(999).amount(3500).build();
+        String json = objectMapper.writeValueAsString(transfer);
+        given(accountService.transferFunds(anyInt(), anyInt(), anyDouble())).willReturn(ID_MISMATCH.toString());
+        mockMvc.perform(post("/api/accounts/funds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isNotFound())
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void givenAccounts_whenTransferFounds_thenInsufficientFunds() throws Exception {
+        TransferRequest transfer = TransferRequest.builder().from(1).to(2).amount(95000).build();
+        String json = objectMapper.writeValueAsString(transfer);
+        given(accountService.transferFunds(anyInt(), anyInt(), anyDouble())).willReturn(INSUFFICIENT_FUNDS.toString());
+        mockMvc.perform(post("/api/accounts/funds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isUnprocessableEntity())
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void givenAccounts_whenTransferFounds_thenSuccess() throws Exception {
+        TransferRequest transfer = TransferRequest.builder().from(1).to(2).amount(278).build();
+        String json = objectMapper.writeValueAsString(transfer);
+        given(accountService.transferFunds(anyInt(), anyInt(), anyDouble())).willReturn(SUCCESS.toString());
+        mockMvc.perform(post("/api/accounts/funds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void givenAccounts_whenTransferFoundsWithInvalidAmount_thenBadRequest() throws Exception {
+        TransferRequest transfer = TransferRequest.builder().from(1).to(2).amount(-12345).build();
+        String json = objectMapper.writeValueAsString(transfer);
+        mockMvc.perform(post("/api/accounts/funds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isBadRequest())
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void givenAccounts_whenTransferFoundsWithInvalidAccounts_thenBadRequest() throws Exception {
+        TransferRequest transfer = TransferRequest.builder().from(1).to(1).amount(500).build();
+        String json = objectMapper.writeValueAsString(transfer);
+        mockMvc.perform(post("/api/accounts/funds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isBadRequest())
+                .andDo(MockMvcResultHandlers.print());
     }
 
     @Test

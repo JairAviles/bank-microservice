@@ -3,6 +3,7 @@ package com.wipro.bank.controller;
 import com.wipro.bank.bean.AccountDTO;
 import com.wipro.bank.bean.AccountRequest;
 import com.wipro.bank.bean.CustomerDTO;
+import com.wipro.bank.bean.TransferRequest;
 import com.wipro.bank.exception.AccountNotFoundException;
 import com.wipro.bank.exception.BadRequestException;
 import com.wipro.bank.exception.CustomerNotFoundException;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.wipro.bank.service.TransferStatus.*;
 
 @Log
 @RestController
@@ -67,6 +70,34 @@ public class AccountController {
             return new ResponseEntity<>(this.service.updateAccount(updatedAccountDto), HttpStatus.OK);
         }
 
+    }
+
+    @PostMapping(path = "/funds",produces = "application/json")
+    @ApiOperation(value = "Transfer Funds", notes = "Service for transferring funds from different accounts")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 404, message = "Account not found"),
+            @ApiResponse(code = 422, message = "Insufficient funds")
+    })
+    public ResponseEntity<String> transferFunds(@RequestBody TransferRequest transfer) {
+        if (transfer.getAmount() < 1 ) {
+            String errorMessage = String.format("Transfer amount is invalid");
+            log.severe(errorMessage);
+            throw new BadRequestException(errorMessage);
+        }
+        if (transfer.getFrom() == transfer.getTo()) {
+            String errorMessage = String.format("Should define different accounts numbers");
+            log.severe(errorMessage);
+            throw new BadRequestException(errorMessage);
+        }
+        String result = this.service.transferFunds(transfer.getFrom(), transfer.getTo(), transfer.getAmount());
+        if (result == ID_MISMATCH.toString()) {
+            return new ResponseEntity<>(ID_MISMATCH.toString(), HttpStatus.NOT_FOUND);
+        } else if (result == INSUFFICIENT_FUNDS.toString()) {
+            return new ResponseEntity<>(INSUFFICIENT_FUNDS.toString(), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        return new ResponseEntity<>(SUCCESS.toString(), HttpStatus.OK);
     }
 
     @GetMapping(produces = "application/json")
