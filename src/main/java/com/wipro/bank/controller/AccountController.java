@@ -81,7 +81,7 @@ public class AccountController {
             @ApiResponse(code = 404, message = "Account not found"),
             @ApiResponse(code = 422, message = "Insufficient funds")
     })
-    public ResponseEntity<String> transferFunds(@RequestBody TransferRequest transfer) {
+    public ResponseEntity<Object> transferFunds(@RequestBody TransferRequest transfer) {
         if (transfer.getAmount() < 1 ) {
             String errorMessage = String.format("Transfer amount is invalid");
             log.severe(errorMessage);
@@ -94,11 +94,11 @@ public class AccountController {
         }
         String result = this.service.transferFunds(transfer.getFrom(), transfer.getTo(), transfer.getAmount());
         if (result == ID_MISMATCH.toString()) {
-            return new ResponseEntity<>(ID_MISMATCH.toString(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(ID_MISMATCH, HttpStatus.NOT_FOUND);
         } else if (result == INSUFFICIENT_FUNDS.toString()) {
-            return new ResponseEntity<>(INSUFFICIENT_FUNDS.toString(), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(INSUFFICIENT_FUNDS, HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        return new ResponseEntity<>(SUCCESS.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(SUCCESS, HttpStatus.OK);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

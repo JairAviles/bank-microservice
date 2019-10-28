@@ -83,7 +83,7 @@ public class AccountService {
      * @param amount
      * @return TransferStatus
      */
-
+    @Transactional
     public String transferFunds(int from, int to, double amount) {
         if (!exists(from) || !exists(to)) {
             return TransferStatus.ID_MISMATCH.toString();

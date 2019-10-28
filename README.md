@@ -26,3 +26,4 @@
 - DB DDL definition in **application/resources**, inserting 4 customer by default
 - Jacoco test report coverage available in path **target/site/jacoco/index.html**
 - Opening application in [localhost:8080/](localhost:8080/) will redirect to swagger ui page
+- H2 console available in [default page](localhost:8080/h2-console)

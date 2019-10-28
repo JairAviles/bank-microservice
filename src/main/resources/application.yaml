@@ -11,6 +11,9 @@ spring:
             non_contextual_creation: true
   main:
     allow-bean-definition-overriding: true
+  h2:
+    console:
+      enabled: true
 logging:
   level:
     sql: debug
