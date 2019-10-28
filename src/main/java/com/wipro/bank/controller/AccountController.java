@@ -17,6 +17,7 @@ import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class AccountController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @PostMapping(produces = "application/json")
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create Account", notes = "Service for creating a new customer")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Account created successfully"),
@@ -52,7 +53,7 @@ public class AccountController {
         return new ResponseEntity<>(this.service.addAccount(accountDto), HttpStatus.CREATED);
     }
 
-    @PutMapping(path = "/{id}", produces = "application/json")
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update Account", notes = "Service for updating an existing account")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Account updated successfully"),
@@ -72,7 +73,7 @@ public class AccountController {
 
     }
 
-    @PostMapping(path = "/funds",produces = "application/json")
+    @PostMapping(path = "/funds", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Transfer Funds", notes = "Service for transferring funds from different accounts")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -100,7 +101,7 @@ public class AccountController {
         return new ResponseEntity<>(SUCCESS.toString(), HttpStatus.OK);
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "List Accounts", notes = "Service for finding all existing accounts")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Accounts found")})
     public ResponseEntity<List<AccountDTO>> findAll() {
@@ -125,7 +126,7 @@ public class AccountController {
         }
     }
 
-    @DeleteMapping(path = "/{id}", produces = "application/json")
+    @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Account by Id", notes = "Service for finding an existing account by id")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Customer deleted successfully"),

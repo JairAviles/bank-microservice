@@ -22,5 +22,7 @@
 - Generating jar `mvn clean install`
 - Running spring boot app `mvn clean install spring-boot:run`
 
-
-Jacoco test report coverage available in path **target/site/jacoco/index.html**
+### Acknowledge
+- DB DDL definition in **application/resources**, inserting 4 customer by default
+- Jacoco test report coverage available in path **target/site/jacoco/index.html**
+- Opening application in [localhost:8080/](localhost:8080/) will redirect to swagger ui page

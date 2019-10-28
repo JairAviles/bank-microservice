@@ -21,7 +21,7 @@ public class AccountDAOImpl implements IAccountDAO {
      */
     @Override
     public AccountDTO saveAccount(AccountDTO account) {
-        entityManager.persist(account);
+        entityManager.merge(account);
         return account;
     }
 

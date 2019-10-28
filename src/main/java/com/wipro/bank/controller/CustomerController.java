@@ -13,6 +13,7 @@ import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +32,7 @@ public class CustomerController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "List Customers", notes = "Service for finding all existing customers")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Customers found")})
     public ResponseEntity<List<CustomerDTO>> findAll() {
@@ -56,7 +57,7 @@ public class CustomerController {
         }
     }
 
-    @PostMapping(produces = "application/json")
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create Customer", notes = "Service for creating a new customer")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Customer created successfully"),
@@ -67,7 +68,7 @@ public class CustomerController {
         return new ResponseEntity<>(this.service.addCustomer(customerDto), HttpStatus.CREATED);
     }
 
-    @PutMapping(path = "/{id}", produces = "application/json")
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update Customer", notes = "Service for updating an existing customer")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Customer updated successfully"),
@@ -87,7 +88,7 @@ public class CustomerController {
 
     }
 
-    @DeleteMapping(path = "/{id}", produces = "application/json")
+    @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Customer by Id", notes = "Service for finding an existing customer by id")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Customer deleted successfully"),

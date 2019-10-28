@@ -23,7 +23,7 @@ public class CustomerDTO implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade=CascadeType.ALL, mappedBy = "customer", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
     @JsonManagedReference
     private Set<AccountDTO> accounts;
 
